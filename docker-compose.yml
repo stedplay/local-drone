@@ -1,0 +1,35 @@
+version: '3'
+services:
+  drone-server:
+    image: drone/drone:0.8-alpine
+    environment:
+      - DRONE_HOST=${LOCALTUNNEL_PROTOCOL}${LOCALTUNNEL_SUBDOMAIN}${LOCALTUNNEL_DOMAIN}
+      - DRONE_OPEN=false
+      - DRONE_ADMIN=${DRONE_ADMIN}
+      - DRONE_SECRET=${DRONE_SECRET}
+      - DRONE_GITHUB=true
+      - DRONE_GITHUB_CLIENT=${DRONE_GITHUB_CLIENT}
+      - DRONE_GITHUB_SECRET=${DRONE_GITHUB_SECRET}
+    ports:
+      - ${DRONE_PORT}:8000
+      - 9000:9000
+    restart: always
+    volumes:
+      - ./_data/drone-server/:/var/lib/drone/
+
+  drone-agent:
+    image: drone/agent:0.8-alpine
+    depends_on:
+      - drone-server
+    environment:
+      - DRONE_SERVER=drone-server:9000
+      - DRONE_SECRET=${DRONE_SECRET}
+    restart: always
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  localtunnel:
+    build: ./localtunnel/
+    command: ${DRONE_PORT} --subdomain ${LOCALTUNNEL_SUBDOMAIN}
+    network_mode: host
+    restart: always

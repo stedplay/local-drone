@@ -11,6 +11,7 @@ services:
       - 3306:3306
     restart: always
     volumes:
+      - ./drone-db/my.cnf:/etc/mysql/conf.d/my.cnf
       - ./_data/drone-db/:/var/lib/mysql/
 
   drone-server:
@@ -26,7 +27,7 @@ services:
       - DRONE_GITHUB_CLIENT=${DRONE_GITHUB_CLIENT}
       - DRONE_GITHUB_SECRET=${DRONE_GITHUB_SECRET}
       - DRONE_DATABASE_DRIVER=mysql
-      - DRONE_DATABASE_DATASOURCE=${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(drone-db:3306)/${MYSQL_DATABASE}
+      - DRONE_DATABASE_DATASOURCE=${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(drone-db:3306)/${MYSQL_DATABASE}?charset=utf8mb4
     ports:
       - ${DRONE_PORT}:8000
       - 9000:9000

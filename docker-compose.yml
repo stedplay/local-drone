@@ -1,7 +1,7 @@
 version: '3'
 services:
   drone-db:
-    image: mysql:5.7.22
+    build: ./drone-db/
     environment:
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=${MYSQL_DATABASE}
@@ -11,7 +11,8 @@ services:
       - 3306:3306
     restart: always
     volumes:
-      - ./drone-db/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./drone-db/my.cnf:/etc/mysql/my.cnf
+      - ./drone-db/entrypoint.sh:/opt/entrypoint.sh
       - ./_data/drone-db/:/var/lib/mysql/
 
   drone-server:

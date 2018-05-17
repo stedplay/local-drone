@@ -23,6 +23,10 @@ Read following after replace 'any_\*' and 'your_\*' to appropriate value.
 
 ```
 $ cat .env.template
+MYSQL_ROOT_PASSWORD=any_string_root_password
+MYSQL_DATABASE=any_string_database_name
+MYSQL_USER=any_string_user_name
+MYSQL_PASSWORD=any_string_user_password
 DRONE_PORT=any_number_port
 DRONE_ADMIN=your_github_username
 DRONE_SECRET=any_string_secret

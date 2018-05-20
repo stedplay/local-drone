@@ -15,6 +15,26 @@ services:
       - ./drone-db/entrypoint.sh:/opt/entrypoint.sh
       - ./_data/drone-db/:/var/lib/mysql/
 
+  drone-db-backup:
+    build:
+      context: ./drone-db-backup/
+      args:
+        - TZ=${TIME_ZONE}
+    depends_on:
+      - drone-db
+    environment:
+      - MYSQL_HOST=drone-db
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_USER=${MYSQL_USER}
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD}
+      - GDRIVE_ACCOUNT=${GDRIVE_ACCOUNT}
+      - GDRIVE_SYNC_DST_DIR=${GDRIVE_SYNC_DST_DIR}
+    restart: always
+    volumes:
+      - ./drone-db-backup/crontab_root:/etc/crontabs/root
+      - ./drone-db-backup/script/:/opt/script/
+      - ./_data/drone-db-backup/:/var/backup/
+
   drone-server:
     image: drone/drone:0.8-alpine
     depends_on:

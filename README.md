@@ -1,6 +1,6 @@
 # local-drone
 
-## Usage
+## Basic usage
 
 Read following after replace 'any_\*' and 'your_\*' to appropriate value.
 
@@ -23,10 +23,13 @@ Read following after replace 'any_\*' and 'your_\*' to appropriate value.
 
 ```
 $ cat .env.template
+TIME_ZONE=your_continent/your_region   # e.g. Asia/Tokyo
 MYSQL_ROOT_PASSWORD=any_string_root_password
 MYSQL_DATABASE=any_string_database_name
 MYSQL_USER=any_string_user_name
 MYSQL_PASSWORD=any_string_user_password
+GDRIVE_ACCOUNT=your_mail_address@gmail.com
+GDRIVE_SYNC_DST_DIR=/any_string_directory/any_string_subdirectory/
 DRONE_PORT=any_number_port
 DRONE_ADMIN=your_github_username
 DRONE_SECRET=any_string_secret
@@ -89,3 +92,83 @@ pipeline:
 ```
 
 For details, refer to Usage Documentation. http://docs.drone.io/getting-started/
+
+## Usage of the container to backup database
+
+### How to change the time to backup
+
+Backup is run by crond. If want to change the default time to run, edit crontab_root file and restart the container.
+
+```
+$ cat ./drone-db-backup/crontab_root
+0 2 * * * /opt/script/backup.sh
+$ vi ./drone-db-backup/crontab_root
+$ docker-compose restart drone-db-backup
+```
+
+### How to restore data from backup file
+
+Remove container and database data. Then, restart local-drone.
+
+```
+$ docker-compose down --rmi all
+$ rm -r ./_data/drone-db/
+$ docker-compose up -d
+```
+
+Decompress the backup file, and restore it to database.
+
+```
+$ docker-compose exec drone-db-backup gzip -dk /var/backup/dump.sql_YYYYMMDD_HHMISS.gz
+$ docker-compose exec drone-db-backup sh -c \
+  'mysql --host=drone-db \
+  --user=any_string_user_name \
+  --password=any_string_user_password \
+  any_string_database_name \
+  < /var/backup/dump.sql_YYYYMMDD_HHMISS'
+```
+
+Access to drone-server. If the server doesn't work well, try following.
+
+- Logout from drone.
+- Inactivate the repository in repositories list, and activate again.
+
+### How to upload the backup file to google drive.
+
+GDrive(https://github.com/prasmussen/gdrive) access your Google Account. Authentication is needed to send the backup file to google drive.
+
+1. Execute the command described below to get the url for authentication.
+2. Access to the displayed url with browser.
+3. Select the same account set to GDRIVE_ACCOUNT in .env file.
+4. Copy verification code, and enter it into the console.
+
+```
+$ docker-compose exec drone-db-backup gdrive-linux-x64 about
+Authentication needed
+Go to the following url in your browser:
+https://accounts.google.com/o/oauth2/auth?access_type=offline&client_id=...
+
+Enter verification code: XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+User: ..., your_mail_address@gmail.com
+Used: ... GB
+Free: ... GB
+Total: ... GB
+Max upload size: ... TB
+$
+```
+
+#### How to change the account
+
+If want to change the account to upload, remove .gdrive directory and authenticate again.
+
+```
+$ docker-compose exec drone-db-backup rm -r /root/.gdrive/
+```
+
+### How to disable backup
+
+If don't need backup, execute following command when run local-drone.
+
+```
+$ docker-compose up -d --scale drone-db-backup=0
+```

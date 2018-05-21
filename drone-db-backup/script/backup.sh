@@ -38,7 +38,7 @@ cd $(dirname $0)
 
 # Initialize.
 LOGROTATE_CONF_PATH='./logrotate.conf'
-DUMP_PATH=$(head -n 1 ${LOGROTATE_CONF_PATH})
+DUMP_PATH=$(head -n 1 ${LOGROTATE_CONF_PATH} | tr -d '{')
 GDRIVE_SYNC_SRC_DIR=$(dirname ${DUMP_PATH})/
 MAIL_ADDRESS=${GDRIVE_ACCOUNT}
 MAIL_BODY_TAG_NAME=mail_body
@@ -49,7 +49,8 @@ check_error "mysqldump --skip-extended-insert --order-by-primary --host=${MYSQL_
 ls -l ${GDRIVE_SYNC_SRC_DIR}
 
 # Rotate dump file.
-check_error "logrotate -v ${LOGROTATE_CONF_PATH} 2>&1"
+check_error "DATE=${DATE} logrotate -v ${LOGROTATE_CONF_PATH} 2>&1"
+ls -l ${GDRIVE_SYNC_SRC_DIR}
 
 # Send dump file to remote.
 check_error "./sync_to_gdrive.sh ${GDRIVE_BIN_PATH} ${GDRIVE_ACCOUNT} ${GDRIVE_SYNC_SRC_DIR} ${GDRIVE_SYNC_DST_DIR} ${MAIL_BODY_TAG_NAME} 2>&1"

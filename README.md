@@ -159,10 +159,16 @@ $
 
 #### How to change the account
 
-If want to change the account to upload, remove .gdrive directory and authenticate again.
+If want to change the account to upload, execute following commands.
+
+1. Change GDRIVE_ACCOUNT to the another acount in .env file.
+2. Reload environment variables in the container. (/root/.gdrive/ directory that save the data to upload is cleared concomitantly with recreating the container.)
+3. Authenticate again with the another acount.
 
 ```
-$ docker-compose exec drone-db-backup rm -r /root/.gdrive/
+$ vi .env   # Change GDRIVE_ACCOUNT
+$ docker-compose up -d
+$ docker-compose exec drone-db-backup gdrive-linux-x64 about
 ```
 
 ### How to disable backup

@@ -11,7 +11,7 @@
 # Usage:
 #   send_mail ${RESULT} "${MAIL_BODY}"
 function send_mail() {
-  ./send_mail.sh ${MAIL_ADDRESS} "[$1] drone-db-backup ${DATE}" "$2"
+  ./send_mail.sh ${MAIL_ADDRESS} "[$1] $(hostname) ${DATE}" "$2"
 }
 
 # IF command occur error, send error mail and exit.

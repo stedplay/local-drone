@@ -29,6 +29,7 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - GDRIVE_ACCOUNT=${GDRIVE_ACCOUNT}
       - GDRIVE_SYNC_DST_DIR=${GDRIVE_SYNC_DST_DIR}
+    hostname: drone-db-backup
     restart: always
     volumes:
       - ./drone-db-backup/crontab_root:/etc/crontabs/root

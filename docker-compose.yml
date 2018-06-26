@@ -7,8 +7,6 @@ services:
       - MYSQL_DATABASE=${MYSQL_DATABASE}
       - MYSQL_USER=${MYSQL_USER}
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
-    ports:
-      - 3306:3306
     restart: always
     volumes:
       - ./drone-db/my.cnf:/etc/mysql/my.cnf
@@ -29,6 +27,7 @@ services:
       - MYSQL_PASSWORD=${MYSQL_PASSWORD}
       - GDRIVE_ACCOUNT=${GDRIVE_ACCOUNT}
       - GDRIVE_SYNC_DST_DIR=${GDRIVE_SYNC_DST_DIR}
+    hostname: drone-db-backup
     restart: always
     volumes:
       - ./drone-db-backup/crontab_root:/etc/crontabs/root
@@ -51,7 +50,6 @@ services:
       - DRONE_DATABASE_DATASOURCE=${MYSQL_USER}:${MYSQL_PASSWORD}@tcp(drone-db:3306)/${MYSQL_DATABASE}?charset=utf8mb4
     ports:
       - ${DRONE_PORT}:8000
-      - 9000:9000
     restart: always
 
   drone-agent:

@@ -67,4 +67,4 @@ services:
     build: ./localtunnel/
     command: ${DRONE_PORT} --subdomain ${LOCALTUNNEL_SUBDOMAIN}
     network_mode: host
-    restart: always
+    restart: unless-stopped
